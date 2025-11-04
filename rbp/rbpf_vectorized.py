@@ -2,18 +2,23 @@
 import numpy as np
 import csv
 import matplotlib.pyplot as plt
+from itertools import islice
+
+#time for 350 particles, 500 samples, Nplot 10 * 100: 4.60 seconds
+import time
+start_time = time.time()  # start timer
 
 # --- LOAD DATA ---
 x_data, y_data, z_data = [], [], []
 with open('../data/individual/gravity.csv', 'r') as file:
     reader = csv.reader(file)
-    for row in reader:
+    # Limit to first 500 rows for faster testing
+    for row in islice(reader, 500): 
         x_data.append(float(row[0]))
         y_data.append(float(row[1]))
         z_data.append(float(row[2]))
 
-# vars we're working with:
-measurements = np.array(x_data)  # shape (T,)
+measurements = np.array(x_data)
 
 # --- KALMAN FILTER DEFAULTS ---
 class KalmanDefaults:
@@ -146,7 +151,7 @@ class RaoBlackwellizedPF:
         return b_est, z_est, w
 
 # --- Run RBPF on measurements ---
-N_particles = 10
+N_particles = 350
 rbpf = RaoBlackwellizedPF(N_particles, kf_defaults, resample_threshold=0.5)
 
 z_estimates = []
@@ -165,8 +170,11 @@ z_estimates = np.array(z_estimates)
 acc_est = z_estimates[:, 0]
 
 # ------------------ Plot results ------------------
-Nplot = 10 * 50  # first 10 seconds assuming 50 Hz
+Nplot = 10 * 100  # first 10 seconds assuming 100 Hz
 plt.figure(figsize=(12,10))
+
+end_time = time.time()  # stop timer after processing
+print(f"Total processing time (including file read): {end_time - start_time:.2f} seconds")
 
 plt.subplot(3,1,1)
 plt.plot(measurements[:Nplot], label='Original X (measurement)')
