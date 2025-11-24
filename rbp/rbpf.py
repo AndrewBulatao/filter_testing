@@ -10,10 +10,10 @@ start_time = time.time()
 
 # --- LOAD DATA ---
 x_data, y_data, z_data = [], [], []
-with open('../data/individual/gravity.csv', 'r') as file:
+with open('../data/individual/acceleration.csv', 'r') as file:
     reader = csv.reader(file)
-    # Limit to first 500 rows for faster testing
-    for row in islice(reader, 500): 
+    # Limit to first 1000 rows for faster testing
+    for row in islice(reader, 400): 
         x_data.append(float(row[0]))
         y_data.append(float(row[1]))
         z_data.append(float(row[2]))
@@ -176,8 +176,8 @@ class RaoBlackwellizedPF:
         return b_est, z_est, w
 
 # ------------------ Run RBPF on measurements ------------------
-N_particles = 350
-rbpf = RaoBlackwellizedPF(N_particles, kf_defaults, resample_threshold=0.5)
+N_particles = 500
+rbpf = RaoBlackwellizedPF(N_particles, kf_defaults, resample_threshold=0.3)
 
 z_estimates = []
 b_estimates = []
@@ -198,7 +198,7 @@ z_estimates = np.array(z_estimates)  # T x 2
 acc_est = z_estimates[:, 0]
 
 # ------------------ Plot results (similar to your original plotting) ------------------
-Nplot = 10 * 100  # first 10 seconds assuming 50 Hz
+Nplot = 400  # number of samples to plot
 plt.figure(figsize=(12,10))
 
 
